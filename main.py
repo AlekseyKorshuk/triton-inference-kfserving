@@ -26,7 +26,7 @@ URL = "localhost"
 
 DEFAULT_CONFIG = {
     'protocol': 'http',
-    'url': f'{URL}:80',
+    'url': f'{URL}:8000',
     'model_name': 'fastertransformer',
     'verbose': False,
 }
