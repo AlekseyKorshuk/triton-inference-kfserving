@@ -234,7 +234,7 @@ class KFServingHuggingFace(kfserving.KFModel):
         inputs = request['instances']
         start_time = time.time()
         responses = self.triton_inference(self.client, inputs)
-        print(f"Done in {time.time() - start_time} seconds")
+        logger.info(f"Done in {time.time() - start_time} seconds.")
         return {'predictions': responses}
 
     def _set_ready_flag(self):
