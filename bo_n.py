@@ -230,7 +230,7 @@ class KFServingHuggingFace(kfserving.KFModel):
                 value_data = [[len(sample_input_ids)] for sample_input_ids in input_ids]
                 data = np.array([data for data in value_data], dtype=value['dtype'])
             elif value['name'] == 'random_seed':
-                random_seed = random.randint(0, 42)
+                random_seed = random.randint(0, 10)
                 logger.info(f'Random seed: {random_seed}')
                 data = np.array([[random_seed] for _ in range(1)], dtype=value['dtype'])
             else:
