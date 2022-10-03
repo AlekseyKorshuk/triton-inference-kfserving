@@ -45,7 +45,7 @@ GENERATION_CONFIG = {
         },
         {
             "name": "request_output_len",
-            "data": [[256]],
+            "data": [[64]],
             "dtype": "uint32"
         },
         {
