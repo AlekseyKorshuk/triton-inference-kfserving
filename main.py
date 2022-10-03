@@ -45,7 +45,7 @@ GENERATION_CONFIG = {
         },
         {
             "name": "request_output_len",
-            "data": [[64]],
+            "data": [[256]],
             "dtype": "uint32"
         },
         {
@@ -55,7 +55,7 @@ GENERATION_CONFIG = {
         },
         {
             "name": "repetition_penalty",
-            "data": [[1.13]],
+            "data": [[1.13125]],
             "dtype": "float32"
         },
         {
@@ -168,7 +168,8 @@ class KFServingHuggingFace(kfserving.KFModel):
                 value_data = [[len(sample_input_ids)] for sample_input_ids in input_ids]
                 data = np.array([data for data in value_data], dtype=value['dtype'])
             elif value['name'] == 'random_seed':
-                data = np.array([[random.randint(0, 10000000)] for _ in range(len(input_ids))], dtype=value['dtype'])
+                random_seed = random.randint(0, 10000000)
+                data = np.array([[random_seed] for _ in range(len(input_ids))], dtype=value['dtype'])
             else:
                 data = np.array([data for data in value['data']] * len(input_ids), dtype=value['dtype'])
 
