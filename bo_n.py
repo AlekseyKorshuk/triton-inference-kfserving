@@ -289,7 +289,8 @@ class KFServingHuggingFace(kfserving.KFModel):
             try:
                 self.triton_inference(self.client, ["User: Write 'yes'\nBot:"])
                 break
-            except:
+            except Exception as ex:
+                print(ex)
                 time.sleep(1)
 
         logger.info('Model loaded.')
