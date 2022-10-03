@@ -275,6 +275,7 @@ class KFServingHuggingFace(kfserving.KFModel):
         start_time = time.time()
 
         self.load_tokenizer()
+        self.load_evaluation()
 
         self.client = httpclient.InferenceServerClient(DEFAULT_CONFIG['url'], verbose=DEFAULT_CONFIG['verbose'],
                                                        concurrency=10)
