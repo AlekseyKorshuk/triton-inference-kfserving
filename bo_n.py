@@ -47,7 +47,7 @@ GENERATION_CONFIG = {
         },
         {
             "name": "request_output_len",
-            "data": [[64]],
+            "data": [[256]],
             "dtype": "uint32"
         },
         {
@@ -57,7 +57,7 @@ GENERATION_CONFIG = {
         },
         {
             "name": "repetition_penalty",
-            "data": [[1.13]],
+            "data": [[1.13125]],
             "dtype": "float32"
         },
         {
@@ -308,7 +308,7 @@ class KFServingHuggingFace(kfserving.KFModel):
             best_responses.append(best_response)
 
         logger.info(f"Done in {time.time() - start_time} seconds.")
-        return {'predictions': best_response}
+        return {'predictions': best_responses}
 
     def _set_ready_flag(self):
         """Used by readiness probe. """
