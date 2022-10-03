@@ -224,7 +224,6 @@ class KFServingHuggingFace(kfserving.KFModel):
         input_ids = self.tokenizer(texts, return_tensors="np", padding="longest").input_ids
         # input_ids = [[1] * len(texts)]
         for index, value in enumerate(params):
-
             if value['name'] == 'input_ids':
                 data = np.array([data for data in input_ids], dtype=value['dtype'])
             elif value['name'] == 'input_lengths':
@@ -304,7 +303,7 @@ class KFServingHuggingFace(kfserving.KFModel):
             responses = self.triton_inference(self.client, batch)
             scored_responses = self._pick_best_response(input, responses)
             sorted_responses = sorted(scored_responses, key=lambda d: d['score'])
-            best_response = sorted_responses[-1]["text"]
+            best_response = sorted_responses[-1]["text"].strip()
             best_responses.append(best_response)
 
         logger.info(f"Done in {time.time() - start_time} seconds.")
