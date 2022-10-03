@@ -221,7 +221,6 @@ class KFServingHuggingFace(kfserving.KFModel):
 
     def generate_parameters_from_texts(self, texts):
         params = deepcopy(GENERATION_CONFIG["request"])
-        print(texts)
         input_ids = self.tokenizer(texts, return_tensors="np", padding="longest").input_ids
         # input_ids = [[1] * len(texts)]
         for index, value in enumerate(params):
@@ -301,7 +300,7 @@ class KFServingHuggingFace(kfserving.KFModel):
 
         best_responses = []
         for input in inputs:
-            batch = [inputs] * BO_N
+            batch = [input] * BO_N
             responses = self.triton_inference(self.client, batch)
             scored_responses = self._pick_best_response(input, responses)
             sorted_responses = sorted(scored_responses, key=lambda d: d['score'])
