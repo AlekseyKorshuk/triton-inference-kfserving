@@ -78,7 +78,7 @@ GENERATION_CONFIG = {
         {
             "name": "beam_width",
             "data": [[1]],
-            "dtype": "int32"
+            "dtype": "uint32"
         },
         {
             "name": "stop_words_list",
