@@ -158,7 +158,8 @@ class KFServingHuggingFace(kfserving.KFModel):
     def generate_parameters_from_texts(self, texts):
         params = deepcopy(GENERATION_CONFIG["request"])
 
-        input_ids = self.tokenizer(texts, return_tensors="np", padding="longest").input_ids
+        input_ids = self.tokenizer(texts, return_tensors="np", add_special_tokens=False, padding="max_length",
+                                   max_length=1024).input_ids
         # input_ids = [[1] * len(texts)]
         for index, value in enumerate(params):
 
