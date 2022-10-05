@@ -12,7 +12,6 @@ from tritonclient.utils import np_to_triton_dtype
 from copy import deepcopy
 import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
-import deepspeed
 
 SERVER_NUM_WORKERS = int(os.environ.get('SERVER_NUM_WORKERS', 1))
 SERVER_PORT = int(os.environ.get('SERVER_PORT', 8080))
@@ -48,7 +47,7 @@ GENERATION_CONFIG = {
         },
         {
             "name": "request_output_len",
-            "data": [[256]],
+            "data": [[64]],
             "dtype": "uint32"
         },
         {
@@ -165,15 +164,8 @@ class KFServingHuggingFace(kfserving.KFModel):
         self.eval_tokenizer.truncation_side = 'left'
 
         logger.info('loading reward model {}'.format(REWARD_MODEL))
-        self.eval_model = AutoModelForSequenceClassification.from_pretrained(REWARD_MODEL)
+        self.eval_model = AutoModelForSequenceClassification.from_pretrained(REWARD_MODEL).to(0)
         self.eval_model.config.pad_token_id = self.eval_model.config.eos_token_id
-        self.eval_model = deepspeed.init_inference(
-            model=self.eval_model,  # Transformers models
-            mp_size=1,  # Number of GPU
-            dtype=torch.half,  # dtype of the weights (fp16)
-            replace_method="auto",  # Lets DS autmatically identify the layer to replace
-            replace_with_kernel_inject=True,  # replace the model with the kernel injector
-        )
 
     def _format_string_for_eval_model_input(self, string):
         bot_messages = 3
@@ -325,6 +317,33 @@ class KFServingHuggingFace(kfserving.KFModel):
 
         logger.info(f"Done in {time.time() - start_time} seconds.")
         return {'predictions': best_responses}
+
+    def set_params(self, params):
+        global GENERATION_CONFIG
+        for key in params.keys():
+            for i in range(len(GENERATION_CONFIG["request"])):
+                if GENERATION_CONFIG["request"][i]["name"] == key:
+                    GENERATION_CONFIG["request"][i]["data"] = [[params[key]]]
+                    break
+
+    def evaluate(self, request, parameters=None):
+        inputs = request['instances']
+        num_tests = request['num_tests']
+        generation_params = request['generation_params']
+        self.set_params(generation_params)
+        start_time = time.time()
+
+        responses = []
+        for input in inputs:
+            batch = [input] * num_tests
+            responses = self.triton_inference(self.client, batch)
+            scored_responses = self._pick_best_response(input, responses)
+            # sorted_responses = sorted(scored_responses, key=lambda d: d['score'])
+            # best_response = sorted_responses[-1]["text"].strip()
+            responses.append(scored_responses)
+
+        logger.info(f"Done in {time.time() - start_time} seconds.")
+        return {'predictions': responses}
 
     def _set_ready_flag(self):
         """Used by readiness probe. """
