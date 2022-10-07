@@ -36,17 +36,17 @@ GENERATION_CONFIG = {
         {
             "name": "input_ids",
             "data": [],
-            "dtype": "uint32"
+            "dtype": "int32"
         },
         {
             "name": "input_lengths",
             "data": [],
-            "dtype": "uint32"
+            "dtype": "int32"
         },
         {
             "name": "request_output_len",
             "data": [[64]],
-            "dtype": "uint32"
+            "dtype": "int32"
         },
         {
             "name": "temperature",
@@ -66,7 +66,7 @@ GENERATION_CONFIG = {
         {
             "name": "runtime_top_k",
             "data": [[0]],
-            "dtype": "uint32"
+            "dtype": "int32"
         },
         {
             "name": "runtime_top_p",
@@ -219,7 +219,8 @@ class KFServingHuggingFace(kfserving.KFModel):
             try:
                 self.triton_inference(self.client, ["User: Write 'yes'\nBot:"])
                 break
-            except:
+            except Exception as ex:
+                print(ex)
                 time.sleep(1)
 
         logger.info('Model loaded.')
