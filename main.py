@@ -61,7 +61,7 @@ GENERATION_CONFIG = {
         {
             "name": "random_seed",
             "data": [[0]],
-            "dtype": "int32"
+            "dtype": "uint64"
         },
         {
             "name": "runtime_top_k",
