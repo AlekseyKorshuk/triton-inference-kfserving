@@ -136,6 +136,16 @@ def prepare_tensor(client, name, input):
     return t
 
 
+def get_last_message(text):
+    if text == "":
+        return ""
+    if text[-1] == "\n":
+        return ""
+    last_raw = text.split("\n")[-1]
+    last_message = last_raw.split(":")[-1]
+    return last_message.strip()
+
+
 class KFServingHuggingFace(kfserving.KFModel):
     def __init__(self, name):
         super().__init__(name)
@@ -148,11 +158,11 @@ class KFServingHuggingFace(kfserving.KFModel):
 
     def load_tokenizer(self):
         logger.info(f'Loading tokenizer from gpt2 ...')
-        self.tokenizer = AutoTokenizer.from_pretrained("gpt2", padding_side="left")
+        self.tokenizer = AutoTokenizer.from_pretrained("gpt2", padding_side="right")
         self.tokenizer.pad_token_id = ['<|endoftext|>']
         assert self.tokenizer.pad_token_id == 50256, 'incorrect padding token'
-        self.tokenizer.padding_side = 'left'
-        self.tokenizer.truncation_side = 'left'
+        self.tokenizer.padding_side = 'right'
+        self.tokenizer.truncation_side = 'right'
         logger.info('Tokenizer loaded.')
 
     def generate_parameters_from_texts(self, texts):
@@ -193,11 +203,10 @@ class KFServingHuggingFace(kfserving.KFModel):
             if output['name'] == "output_ids":
                 for output_ids in result.as_numpy(output['name']):
                     output_ids = [int(output_id) for output_id in list(output_ids[0])]
-                    output_texts.append(self.tokenizer.decode(output_ids, skip_special_tokens=True).strip())
+                    output_text = self.tokenizer.decode(output_ids, skip_special_tokens=True).strip()
+                    output_texts.append(output_text)
                     output_texts_cropped.append(
-                        self.tokenizer.decode(
-                            output_ids[len(request[0]["data"][i]):], skip_special_tokens=True
-                        ).strip()
+                        get_last_message(output_text)
                     )
         return output_texts_cropped
 
