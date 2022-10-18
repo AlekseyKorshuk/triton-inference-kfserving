@@ -58,11 +58,11 @@ GENERATION_CONFIG = {
             "data": [[1.13125]],
             "dtype": "float32"
         },
-        {
-            "name": "random_seed",
-            "data": [[0]],
-            "dtype": "uint64"
-        },
+#         {
+#             "name": "random_seed",
+#             "data": [[0]],
+#             "dtype": "uint64"
+#         },
         {
             "name": "runtime_top_k",
             "data": [[0]],
