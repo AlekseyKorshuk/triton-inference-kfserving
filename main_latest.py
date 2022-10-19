@@ -225,9 +225,7 @@ class KFServingHuggingFace(kfserving.KFModel):
         super().__init__(name)
         self.name = MODEL_NAME
         self.client = NewInferenceService("localhost")
-        gc.enable()
-        self.ready = True
-        self._set_ready_flag()
+        self.ready = False
 
     def predict(self, request, parameters=None):
         inputs = request['instances']
@@ -237,6 +235,30 @@ class KFServingHuggingFace(kfserving.KFModel):
             random_seed = random.randint(0, 100)
         responses = self.client.inference(inputs, random_seed=random_seed)
         return {'predictions': responses}
+
+    def load(self):
+        """
+        Load from a pytorch saved pickle to reduce the time it takes
+        to load the model.  To benefit from this it is important to
+        have run pytorch save on the same machine / hardware.
+        """
+
+        gc.disable()
+        start_time = time.time()
+
+        while True:
+            try:
+                self.triton_inference(self.client, ["User: Write 'yes'\nBot:"])
+                break
+            except Exception as ex:
+                print(ex)
+                time.sleep(1)
+
+        logger.info(f'Model is ready in {str(time.time() - start_time)} seconds.')
+
+        gc.enable()
+        self.ready = True
+        self._set_ready_flag()
 
     def _set_ready_flag(self):
         """Used by readiness probe. """
@@ -265,6 +287,7 @@ if __name__ == '__main__':
         time.sleep(3600 * 10)
 
     model = KFServingHuggingFace(MODEL_NAME)
+    model.load()
 
     kfserving.KFServer(
         http_port=SERVER_PORT,
