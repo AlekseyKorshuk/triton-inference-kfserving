@@ -216,6 +216,7 @@ class KFServingHuggingFace(kfserving.KFModel):
     def predict(self, request, parameters=None):
         inputs = request['instances']
         logger.info(f'Request: {request}')
+        logger.info(f'Parameters: {parameters}')
         if 'random_seed' in request.keys():
             random_seed = request['random_seed']
         else:
