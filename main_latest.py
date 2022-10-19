@@ -234,7 +234,7 @@ class KFServingHuggingFace(kfserving.KFModel):
 
         while True:
             try:
-                self.triton_inference(self.client, ["User: Write 'yes'\nBot:"])
+                self.predict(["User: Write 'yes'\nBot:"])
                 break
             except Exception as ex:
                 print(ex)
