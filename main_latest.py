@@ -237,7 +237,7 @@ class KFServingHuggingFace(kfserving.KFModel):
                 self.predict(["User: Write 'yes'\nBot:"])
                 break
             except Exception as ex:
-                print(ex)
+                logger.info(f'Pinging model: {ex}')
                 time.sleep(1)
 
         logger.info(f'Model is ready in {str(time.time() - start_time)} seconds.')
