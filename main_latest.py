@@ -221,7 +221,7 @@ class KFServingHuggingFace(kfserving.KFModel):
         #     random_seed = parameters['random_seed']
         # else:
         random_seed = random.randint(0, 100)
-        random_seed = -1
+        # random_seed = -1
         logger.info(f'Random seed: {random_seed}')
         responses = self.client.inference(inputs, random_seed=random_seed)
         return {'predictions': responses}
