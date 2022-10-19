@@ -234,7 +234,7 @@ class KFServingHuggingFace(kfserving.KFModel):
 
         while True:
             try:
-                self.predict(["User: Write 'yes'\nBot:"])
+                self.client.inference(["User: Write 'yes'\nBot:"])
                 break
             except Exception as ex:
                 logger.info(f'Pinging model: {ex}')
